@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamic Dropdown Form</title>
+    <style>
+      /* Basic styling */
+      .form {
+        display: flex;
+        flex-direction: column;
+      }
+      .container {
+        width: 400px;
+        height: 200px;
+        flex: content;
+        flex-direction: row;
+        align-items: center;
+        background-color: rgb(216, 236, 236);
+        margin-left: auto;
+        margin-top: auto;
+        margin-right: auto;
+        margin-bottom: auto;
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      form {
+        max-width: 300px;
+        margin: 0 auto;
+      }
+      .form-group {
+        margin-bottom: 10px;
+      }
+      select,
+      input[type="submit"] {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      input[type="submit"] {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      input[type="submit"]:hover {
+        background-color: #45a049;
+      }
+      .error-message {
+        color: red;
+        font-size: 12px;
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Form -->
+    <div class="container">
+      <form class="form" id="myForm" onsubmit="return false;">
+        <div class="form-group">
+          <select id="country" onchange="populateStates()">
+            <option value="">Select Country</option>
+            <!-- Countries will be populated dynamically -->
+          </select>
+        </div>
+        <div class="form-group">
+          <select id="state" onchange="populateCities()">
+            <option value="">Select State</option>
+            <!-- States will be populated dynamically -->
+          </select>
+        </div>
+        <div class="form-group">
+          <select id="city">
+            <option value="">Select City</option>
+            <!-- Cities will be populated dynamically -->
+          </select>
+        </div>
+        <div class="form-group">
+          <input type="submit" value="Submit" onclick="validateForm()" />
+          <div id="error" class="error-message"></div>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      // Sample data for countries, states, and cities
+	  const countryData = {
+	          India: {
+	            Maharashtra: ["Mumbai", "Pune"],
+	            AndhraPradesh: ["Srikakulam", "Vijayanagaram", "Vizag"],
+	            // Add more states and cities as needed
+	          },
+	          // Add more countries and their data here
+	          Pakistan: {
+	            Lahore: ["Bahawalpur"],
+	            Punjab: ["Kasur"],
+	            // Add more states and cities as needed
+	          },
+	        };
+	        // sample data of stations
+	        const stationData = {
+	          Mumbai: ["Station 1", "Station 2", "Station 3", "Station 4"],
+	          Pune: ["Station 11", "Station 12", "Station 13", "Station 14"],
+	          Vijayanagaram: ["Station 21", "Station 22", "Station 23", "Station 24"],
+	          Srikakulam: ["Station 33", "Station 34", "Station 35", "Station 36"],
+	          Vizag: ["Station 41", "Station 42", "Station 43", "Station 44"],
+	          Bahawalpur: ["Station 51", "Station 52", "Station 53", "Station 54"],
+	          Kasur: ["Station 61", "Station 62", "Station 63", "Station 64"],
+	        };
+
+      // Function to populate countries
+      function populateCountry() {
+        const countryDropdown = document.getElementById("country");
+        countryDropdown.innerHTML = '<option value="">Select Country</option>';
+        for (let country in countryData) {
+          countryDropdown.innerHTML += `<option value="${country}">${country}</option>`;
+        }
+      }
+
+      // Function to populate states based on selected country
+      function populateStates() {
+        const country = document.getElementById("country").value;
+        const stateDropdown = document.getElementById("state");
+        stateDropdown.innerHTML = '<option value="">Select State</option>';
+        if (country) {
+          for (let state in countryData[country]) {
+            stateDropdown.innerHTML += `<option value="${state}">${state}</option>`;
+          }
+        }
+      }
+
+      // Function to populate cities based on selected state
+      function populateCities() {
+        const country = document.getElementById("country").value;
+        const state = document.getElementById("state").value;
+        const cityDropdown = document.getElementById("city");
+        cityDropdown.innerHTML = '<option value="">Select City</option>';
+        if (country && state) {
+          for (let city of countryData[country][state]) {
+            cityDropdown.innerHTML += `<option value="${city}">${city}</option>`;
+          }
+        }
+      }
+
+      // Function to validate form before submission
+      function validateForm() {
+        const country = document.getElementById("country").value;
+        const state = document.getElementById("state").value;
+        const city = document.getElementById("city").value;
+        const errorDiv = document.getElementById("error");
+        // Check if any field is empty
+        if (country === "" || state === "" || city === "") {
+          errorDiv.textContent = "Please select all options.";
+          return false;
+        } else {
+          // Alert popup with submitted data
+          alert(
+            `Submitted Data:\nCountry: ${country}\nState: ${state}\nCity: ${city}`
+          );
+          // Construct URL with city and stations data
+          const url = `http://localhost:9090/station1?country=${encodeURIComponent(
+            country
+          )}&state=${encodeURIComponent(state)}&city=${encodeURIComponent(
+            city
+          )}&stations=${encodeURIComponent(JSON.stringify(stationData[city]))}`;
+          // Redirect to the display_stations.html page
+		  //const url1 = `http://localhost:9090/dynamic_slot_diplay`;
+		  
+          window.location.href = url;
+        }
+      }
+      // Populate the country dropdown initially
+      populateCountry();
+    </script>
+  </body>
+</html>
